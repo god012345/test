@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRUD App Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    button {
+      cursor: pointer;
+    }
+    .item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Simple CRUD App Test</h2>
+
+  <!-- CREATE -->
+  <input type="text" id="title" placeholder="Enter title" />
+  <button onclick="createItem()">Create</button>
+
+  <hr />
+
+  <!-- READ -->
+  <button onclick="getItems()">Get All Items</button>
+  <div id="list"></div>
+
+  <script>
+    const API_URL = "http://localhost:5000/api/items"; // change if needed
+
+    // CREATE
+    async function createItem() {
+      const title = document.getElementById("title").value;
+
+      await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ title })
+      });
+
+      document.getElementById("title").value = "";
+      getItems();
+    }
+
+    // READ
+    async function getItems() {
+      const res = await fetch(API_URL);
+      const items = await res.json();
+
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      items.forEach(item => {
+        list.innerHTML += `
+          <div class="item">
+            <p>${item.title}</p>
+            <button onclick="deleteItem('${item._id}')">Delete</button>
+          </div>
+        `;
+      });
+    }
+
+    // DELETE
+    async function deleteItem(id) {
+      await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+      });
+      getItems();
+    }
+  </script>
+
+</body>
+</html>
